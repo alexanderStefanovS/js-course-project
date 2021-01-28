@@ -2,12 +2,9 @@
 import {ConnectionData} from '../classes/connection-data.js';
 import mysql from 'mysql';
 import {ErrorResponse} from '../classes/error-response.js';
-import {processTableNames, processTableColumns, processTablesAndColumns} from '../functions/process-db-data.js';
+import {DB_CONNECT_ERR_MSG} from '../constants/shared-consts.js';
+import {FN_MAP} from '../constants/map-consts.js';
 
-const SQL_TABLE_NAMES = 'SELECT table_name FROM information_schema.tables WHERE table_schema = \'reservation_system\'';
-const SQL_TABLE_COLUMNS = 'SHOW COLUMNS FROM ??';
-const DB_CONNECT_ERR_MSG = 'Error connecting database: ';
-const SQL_TABLES_AND_COLUMNS = 'SELECT DISTINCT c.column_name, c.data_type, t.table_name FROM INFORMATION_SCHEMA.COLUMNS c JOIN INFORMATION_SCHEMA.TABLES t on c.table_name = t.table_name WHERE c.TABLE_SCHEMA = \'reservation_system\'';
 
 function connect(connection) {
   return new Promise((resolve, reject) => {
@@ -57,41 +54,16 @@ export function testConnection(data) {
     });
 }
 
-export function getDatabaseMetadata(data) {
-  const connectionData = new ConnectionData(data);
-  const connection = mysql.createConnection(connectionData);
-
-  return connect(connection)
-    .then(() => query(connection, SQL_TABLE_NAMES, []))
-    .then((results) => end(connection, results))
-    .then((results) => processTableNames(results))
-    .catch((err) => {
-      return new ErrorResponse(err.sqlMessage, `${DB_CONNECT_ERR_MSG} ${connectionData.database}`);
-    });
-} 
-
-export function getTableMetadata(data, tableName) {
-  const connectionData = new ConnectionData(data);
-  const connection = mysql.createConnection(connectionData);
-
-  return connect(connection)
-    .then(() => query(connection, SQL_TABLE_COLUMNS, [`${connectionData.database}.${tableName}`]))
-    .then((results) => end(connection, results))
-    .then((results) => processTableColumns(results))
-    .catch((err) => {
-      return new ErrorResponse(err.sqlMessage, `${DB_CONNECT_ERR_MSG} ${connectionData.database}`);
-    });
+export function getDbMetadata(data, type, params) {
+  return extractData(FN_MAP[type], params, data);
 }
 
-export function getTablesWithColumns(data) {
+function extractData({sql, processFn, errMsg}, params, data) {
   const connectionData = new ConnectionData(data);
   const connection = mysql.createConnection(connectionData);
-
   return connect(connection)
-    .then(() => query(connection, SQL_TABLES_AND_COLUMNS, [`${connectionData.database}`]))
+    .then(() => query(connection, sql, params))
     .then((results) => end(connection, results))
-    .then((results) => processTablesAndColumns(results))
-    .catch((err) => {
-      return new ErrorResponse(err.sqlMessage, `${DB_CONNECT_ERR_MSG} ${connectionData.database}`);
-    });
+    .then((results) => processFn(results))
+    .catch((err) => new ErrorResponse(err.sqlMessage, `${errMsg} ${connectionData.database}`));
 }

@@ -1,8 +1,8 @@
 
 export class TableColumn {
-  constructor(field, key, type) {
-    this.field = field;
-    this.key = key;
-    this.type = type;
+  constructor({columnName, columnKey, dataType}) {
+    this.columnName = columnName;
+    this.columnKey = columnKey;
+    this.dataType = dataType;
   }
 }

@@ -12,6 +12,7 @@ exportModels.post('/from-db', (req, res) => {
   if (connectionData) {
     exportModelsFromDB(connectionData, tables)
       .then((data) => {
+        console.log(data);
         res.send(data);
       });
   } else {

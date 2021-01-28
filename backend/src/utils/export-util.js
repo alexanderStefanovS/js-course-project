@@ -1,5 +1,7 @@
 
-import {getTablesWithColumns} from './db-util.js';
+import {getDbMetadata} from '../utils/db-util.js';
+import {TABLES_COLUMNS_METADATA} from '../constants/map-consts.js';
+import {generateFiles} from '../functions/create-files.js';
 
 function processColumnsAndTablesForExport(tables, dbTables) {
   return tables.reduce((acc, table) => {
@@ -13,9 +15,8 @@ function processColumnsAndTablesForExport(tables, dbTables) {
 }
 
 export function exportModelsFromDB(data, tables) {
-  return getTablesWithColumns(data)
-    .then( (dbTables) => {
-      const exportTables = processColumnsAndTablesForExport(tables, dbTables);
-      return exportTables;
-    });
+  return getDbMetadata(data, TABLES_COLUMNS_METADATA, [data.database])
+    .then( (dbTables) => processColumnsAndTablesForExport(tables, dbTables))
+    .then( (tables) => generateFiles(tables, data.database))
+    .then((result) => result);
 }

@@ -5,9 +5,11 @@ import {Table} from '../classes/table.js';
 const TABLE_NAME = 'table_name';
 const COLUMN_NAME = 'column_name';
 const DATA_TYPE = 'data_type';
-const FIELD = 'Field';
-const TYPE = 'Type';
-const KEY = 'Key';
+const COLUMN_KEY = 'column_key';
+
+function getTypeName(type) {
+  return type.includes('(') ? type.substring(0, type.indexOf('(')) : type;
+}
 
 export function processTableNames(dbResults) {
   return dbResults.reduce((acc, result) => {
@@ -18,7 +20,11 @@ export function processTableNames(dbResults) {
 
 export function processTableColumns(dbResults) {
   return dbResults.reduce((acc, result) => {
-    acc.push(new TableColumn(result[FIELD], result[KEY], result[TYPE]));
+    acc.push(new TableColumn({
+      columnName: result[COLUMN_NAME], 
+      columnKey: result[COLUMN_KEY], 
+      dataType: getTypeName(result[DATA_TYPE])
+    }));
     return acc;
   }, []);
 }
@@ -28,12 +34,14 @@ export function processTablesAndColumns(dbResults) {
     if (map.has(result[TABLE_NAME])) {
       map.get(result[TABLE_NAME]).push({
         columnName: result[COLUMN_NAME],
-        dataType: result[DATA_TYPE]
+        dataType: getTypeName(result[DATA_TYPE]),
+        columnKey: result[COLUMN_KEY],
       });
     } else {
       map.set(result[TABLE_NAME], [{
         columnName: result[COLUMN_NAME],
-        dataType: result[DATA_TYPE]
+        dataType: getTypeName(result[DATA_TYPE]),
+        columnKey: result[COLUMN_KEY],
       }]);
     }
     return map;
@@ -43,7 +51,7 @@ export function processTablesAndColumns(dbResults) {
   tablesMap.forEach((value, key) => {
     const table = new Table(key);
     table.columns = value.reduce((acc, column) => {
-      acc.push(new TableColumn(column.columnName, '', column.dataType));
+      acc.push(new TableColumn(column));
       return acc;
     }, []);
     tables.push(table);
