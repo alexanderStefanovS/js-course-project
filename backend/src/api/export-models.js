@@ -1,22 +1,55 @@
 
 import {Router} from 'express';
 import {parseTables} from '../functions/parse-tables.js';
-import {exportModelsFromDB} from '../utils/export-util.js';
+import {exportModelsFromDB} from '../export/export.js';
+import {readdir} from 'fs';
+import {resolve} from 'path';
+import rimraf from 'rimraf';
 
 export const exportModels = Router();
 
-exportModels.post('/from-db', (req, res) => {
+const GENERATED_FILES_DIR = './generated-files';
+const ARCHIVES_DIR = './archives';
+
+function removeGenratedDirsAndFiles() {
+  readdir(resolve(GENERATED_FILES_DIR), (err, dirs) => {
+    dirs.forEach((dir) => {
+      const dirPath = resolve(`${GENERATED_FILES_DIR}/${dir}`);
+      rimraf(dirPath, () => {
+        console.log(`${dir} is removed`);
+      });
+    });
+  });
+}
+
+exportModels.post('/from-db', (req, res, next) => {
+
   const connectionData = req.session.connectionData;
+  const dbType = req.session.dbType;
   const tables = parseTables(req.body);
+  let emitter;
+
+  function sendArchive(archivePath) {
+    res.download(archivePath, (err) => {
+      if (err) {
+        next(err);
+      } 
+    });
+  }
 
   if (connectionData) {
-    exportModelsFromDB(connectionData, tables)
-      .then((data) => {
-        console.log(data);
-        res.send(data);
+    exportModelsFromDB(dbType, connectionData, tables)
+      .then((e) => {
+        emitter = e;
+        emitter.on('archive-done', sendArchive);
       });
   } else {
     res.send(false);
   }
+
+  req.on('close', () => {
+    emitter.off('archive-done', sendArchive);
+    removeGenratedDirsAndFiles();
+  });
 
 });

@@ -1,6 +1,6 @@
 
-import {TableColumn} from '../classes/table-column.js';
-import {Table} from '../classes/table.js';
+import {TableColumn} from '../../classes/table-column.js';
+import {Table} from '../../classes/table.js';
 
 const TABLE_NAME = 'table_name';
 const COLUMN_NAME = 'column_name';

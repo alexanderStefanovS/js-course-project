@@ -1,0 +1,2 @@
+
+export const MYSQL = 'MySQL';

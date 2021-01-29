@@ -1,10 +1,9 @@
 
-import {ConnectionData} from '../classes/connection-data.js';
+import {MySQLConnectionData} from './mysql-connection-data.js';
 import mysql from 'mysql';
-import {ErrorResponse} from '../classes/error-response.js';
-import {DB_CONNECT_ERR_MSG} from '../constants/shared-consts.js';
-import {FN_MAP} from '../constants/map-consts.js';
-
+import {ErrorResponse} from '../../classes/error-response.js';
+import {DB_CONNECT_ERR_MSG} from './mysql-queries.js';
+import {FN_MAP} from './map-consts.js';
 
 function connect(connection) {
   return new Promise((resolve, reject) => {
@@ -42,8 +41,8 @@ function query(connection, sql, values) {
   });
 }
 
-export function testConnection(data) {
-  const connectionData = new ConnectionData(data);
+export function testMySQLConnection(data) {
+  const connectionData = new MySQLConnectionData(data);
   const connection = mysql.createConnection(connectionData);
 
   return connect(connection)
@@ -54,12 +53,12 @@ export function testConnection(data) {
     });
 }
 
-export function getDbMetadata(data, type, params) {
-  return extractData(FN_MAP[type], params, data);
+export function getMySQLMetadata(data, type, params) {
+  return extractMysqlData(FN_MAP[type], params, data);
 }
 
-function extractData({sql, processFn, errMsg}, params, data) {
-  const connectionData = new ConnectionData(data);
+function extractMysqlData({sql, processFn, errMsg}, params, data) {
+  const connectionData = new MySQLConnectionData(data);
   const connection = mysql.createConnection(connectionData);
   return connect(connection)
     .then(() => query(connection, sql, params))

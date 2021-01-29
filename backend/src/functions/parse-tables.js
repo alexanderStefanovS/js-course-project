@@ -1,6 +1,6 @@
 
-import {TableColumn} from '../classes/table-column.js';
 import {Table} from '../classes/table.js';
+import {TableColumn} from '../classes/table-column.js';
 
 export function parseTables(data) {
   return data.reduce((tables, t) => {

@@ -1,5 +1,5 @@
 
-import {TYPES_MAP} from '../constants/map-types.js';
+import {DATA_TYPES_MAP} from '../db/data-types-map.js';
 import {mkdir, writeFile} from 'fs';
 import {join, resolve} from 'path';
 
@@ -40,14 +40,14 @@ function prepareFieldName(columnName) {
   }, '');
 }
 
-function getType(columnType) {
-  return TYPES_MAP[columnType];
+function getType(dbType, columnType) {
+  return DATA_TYPES_MAP[dbType][columnType];
 }
 
-function prepareFields(columns) {
+function prepareFields(dbType, columns) {
   return columns.reduce((fields, column) => {
     const fieldName = prepareFieldName(column.columnName);
-    const fieldType = getType(column.dataType);
+    const fieldType = getType(dbType, column.dataType);
     const field = `\tprivate _${fieldName}: ${fieldType}\n`;
     return fields.concat(field);
   }, '');
@@ -73,10 +73,10 @@ function generateSetter(field, type) {
   return `\n\tpublic set ${field}(value: ${type}) {\n\t\tthis._${field} = value;\n\t}`;
 }
 
-function prepareGettersAndSetters(columns) {
+function prepareGettersAndSetters(dbType, columns) {
   return columns.reduce((acc, column) => {
     const fieldName = prepareFieldName(column.columnName);
-    const fieldType = getType(column.dataType);
+    const fieldType = getType(dbType, column.dataType);
     return acc.concat(`${generateGetter(fieldName, fieldType)}${generateSetter(fieldName, fieldType)}\n`);
   }, '');
 }
@@ -85,12 +85,12 @@ function prepareClassFooter() {
   return '\n}\n';
 }
 
-function createFile(table, dirname) {
+function createFile(dbType, table, dirname) {
   const [className, fileName] = prepareClassNameAndFileName(table.tableName);
   const classHeader = prepareClassHeader(className);
-  const fields = prepareFields(table.columns);
+  const fields = prepareFields(dbType, table.columns);
   const constructor = prepareConstructor(className, table.columns);
-  const gettersAndSetters = prepareGettersAndSetters(table.columns);
+  const gettersAndSetters = prepareGettersAndSetters(dbType, table.columns);
   const classFooter = prepareClassFooter();
   
   const content = ''.concat(classHeader, fields, constructor, gettersAndSetters, classFooter);
@@ -128,21 +128,21 @@ function mkDir(dirname) {
   });
 }
 
-function createFiles(tables, dirname) {
+function createFiles(dbType, tables, dirname) {
   const filesPromises = tables.reduce((promises, table) => {
-    promises.push(createFile(table, dirname));
+    promises.push(createFile(dbType, table, dirname));
     return promises;
   }, []);
 
   return Promise.all(filesPromises);
 }
 
-export function generateFiles(tables, database) {
+export function generateFiles(dbType, tables, database) {
   const dateAndTime = getDateAndTime();
   const dirname = resolve(`${GENERATED_FILES_DIR}/${database}-${dateAndTime}`);
   
   return mkDir(dirname)
-    .then(() => createFiles(tables, dirname))
-    .then(() => 'files are generated')
-    .catch((err) => console.log(err));
+    .then(() => createFiles(dbType, tables, dirname))
+    .then(() => dirname)
+    .catch((err) => err);
 }

@@ -1,5 +1,5 @@
 
-export class ConnectionData {
+export class MySQLConnectionData {
   constructor(data) {
     this.host = data.host;
     this.user = data.user;
