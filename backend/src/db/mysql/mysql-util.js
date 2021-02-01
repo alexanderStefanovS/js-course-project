@@ -30,6 +30,7 @@ function end(connection, results) {
 }
 
 function query(connection, sql, values) {
+  console.log(sql);
   return new Promise((resolve, reject) => {
     connection.query(sql, values, function(err, results, fields) {
       if (err) {
@@ -49,7 +50,7 @@ export function testMySQLConnection(data) {
     .then(() => end(connection, null))
     .then(() => true)
     .catch((err) => {
-      return new ErrorResponse(err.sqlMessage, `${DB_CONNECT_ERR_MSG} ${connectionData.database}`);
+      return new ErrorResponse(err.code, `${DB_CONNECT_ERR_MSG} ${connectionData.database}`);
     });
 }
 
@@ -64,5 +65,5 @@ function extractMysqlData({sql, processFn, errMsg}, params, data) {
     .then(() => query(connection, sql, params))
     .then((results) => end(connection, results))
     .then((results) => processFn(results))
-    .catch((err) => new ErrorResponse(err.sqlMessage, `${errMsg} ${connectionData.database}`));
+    .catch((err) => new ErrorResponse(err.sqlMessage, `${errMsg}${connectionData.database}`));
 }

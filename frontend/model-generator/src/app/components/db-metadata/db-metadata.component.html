@@ -1,0 +1,70 @@
+<app-header [hasHomeBtn]="true"></app-header>
+<div class="container-fluid p-3">
+  <div class="row">
+    <div class="col-md-4">
+      <div class="card" style="height: calc(100vh - 5.5rem);">
+        <div class="card-header">
+          <h5 class="m-0">TABLES</h5>
+        </div>
+        <div class="card-body overflow-auto p-1">
+          <div class="list-group">
+            <button *ngFor="let table of tables" type="button"
+              class="list-group-item list-group-item-action d-flex justify-content-between"
+              (click)="onClickTable(table)" [ngClass]="{'active': table.tableName === selectedTable?.tableName}">
+              <h6 class="m-0">{{ table.tableName }}</h6>
+              <div>
+                <input (change)="onCheckTable(table)" type="checkbox" [id]="table.tableName"
+                  [checked]="table.isChecked">
+              </div>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card" style="height: calc(100vh - 5.5rem);">
+        <div class="card-header">
+          <h5 class="m-0">TABLE COLUMNS</h5>
+        </div>
+        <div class="card-body overflow-auto p-1">
+          <ul class="list-group">
+            <li *ngFor="let column of selectedTable?.columns" class="list-group-item d-flex justify-content-between">
+              <h6 class="m-0">{{ column.columnName }}</h6>
+              <div *ngIf="selectedTable.isChecked">
+                <input type="checkbox" [id]="column.columnName" [checked]="column.isChecked"
+                  (change)="column.isChecked = !column.isChecked">
+              </div>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card" style="height: calc(100vh - 5.5rem);">
+        <div class="card-header">
+          <h5 class="m-0">SELECTED TABLES AND COLUMNS</h5>
+        </div>
+        <div class="card-body overflow-auto p-1">
+          <ul class="list-group">
+            <div *ngFor="let table of tables">
+              <li *ngIf="table.isChecked" class="list-group-item">
+                <h6 class="mb-2"><b>Table name:</b> {{ table.tableName }}</h6>
+                <p>
+                  <b>Columns:</b>
+                  <span *ngFor="let column of table.columns; let i = index" [hidden]="!column.isChecked">
+                    {{ column.columnName }}<span *ngIf="isSemicolumnNeeded(table.columns, i)">,</span>
+                  </span>
+                </p>
+              </li>
+            </div>
+          </ul>
+        </div>
+        <div class="card-footer d-flex flex-row-reverse">
+          <button type="button" class="btn btn-primary" [disabled]="isGenrateButtonDisabled()">
+            Generate models
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

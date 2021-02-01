@@ -1,8 +1,13 @@
 
 import {Router} from 'express';
+import {DATABASE_TYPES} from '../db/db-types.js';
 import {testConnection} from '../db/extract-db-data.js';
 
 export const dbConnection = Router();
+
+dbConnection.get('/db-types', (req, res) => {
+  res.send(DATABASE_TYPES);
+});
 
 dbConnection.post('/', (req, res) => {
   

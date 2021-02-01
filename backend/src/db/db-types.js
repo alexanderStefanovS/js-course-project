@@ -1,2 +1,4 @@
 
-export const MYSQL = 'MySQL';
+const MYSQL = 'MySQL';
+
+export const DATABASE_TYPES = [MYSQL];

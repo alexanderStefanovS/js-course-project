@@ -1,0 +1,10 @@
+
+.way-button {
+  cursor: pointer;
+}
+
+.way-button:hover {
+  background-color: #007bff;
+  color: white;
+  transition: 0.7s;
+}

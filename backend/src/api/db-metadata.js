@@ -10,7 +10,7 @@ dbMetadata.get('/db', (req, res) => {
   const dbType = req.session.dbType;
 
   if (connectionData) {
-    extractData(dbType, DB_METADATA, connectionData, [])
+    extractData(dbType, DB_METADATA, connectionData, [connectionData.database])
       .then((result) => res.send(result));
   } else {
     res.send(false);

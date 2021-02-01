@@ -1,5 +1,7 @@
 
-import {MYSQL} from './db-types.js';
+import {DATABASE_TYPES} from './db-types.js';
+
+const [MYSQL] = DATABASE_TYPES;
 
 export const DATA_TYPES_MAP = { 
   [MYSQL]: {
