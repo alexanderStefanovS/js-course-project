@@ -12,6 +12,7 @@ import { NgSelectModule } from '@ng-select/ng-select';
 import { HttpClientModule } from '@angular/common/http';
 import { MysqlConnectionFormComponent } from './components/db-connection-forms/mysql-connection-form/mysql-connection-form.component';
 import { DbMetadataComponent } from './components/db-metadata/db-metadata.component';
+import { NgxSpinnerModule } from 'ngx-spinner';
 
 @NgModule({
   declarations: [
@@ -28,6 +29,7 @@ import { DbMetadataComponent } from './components/db-metadata/db-metadata.compon
     AppRoutingModule,
     NgSelectModule,
     FormsModule,
+    NgxSpinnerModule,
     HttpClientModule
   ],
   providers: [],

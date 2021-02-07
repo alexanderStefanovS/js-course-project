@@ -3,8 +3,9 @@ import {Router} from 'express';
 import {parseTables} from '../functions/parse-tables.js';
 import {exportModelsFromDB} from '../export/export.js';
 import {readdir} from 'fs';
-import {resolve} from 'path';
+import {basename, resolve} from 'path';
 import rimraf from 'rimraf';
+import Joi from 'joi';
 
 export const exportModels = Router();
 
@@ -23,14 +24,15 @@ function removeGenratedDirsAndFiles() {
 }
 
 exportModels.post('/from-db', (req, res, next) => {
-
   const connectionData = req.session.connectionData;
   const dbType = req.session.dbType;
   const tables = parseTables(req.body);
   let emitter;
 
   function sendArchive(archivePath) {
-    res.download(archivePath, (err) => {
+    const filename = basename(archivePath);
+    res.set('Filename', filename);
+    res.download(archivePath, filename, (err) => {
       if (err) {
         next(err);
       } 

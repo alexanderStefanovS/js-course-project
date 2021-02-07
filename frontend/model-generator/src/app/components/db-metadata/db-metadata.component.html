@@ -60,7 +60,8 @@
           </ul>
         </div>
         <div class="card-footer d-flex flex-row-reverse">
-          <button type="button" class="btn btn-primary" [disabled]="isGenrateButtonDisabled()">
+          <button type="button" class="btn btn-primary" [disabled]="isGenrateButtonDisabled()"
+            (click)="onGenerateFiles()">
             Generate models
           </button>
         </div>
@@ -68,3 +69,6 @@
     </div>
   </div>
 </div>
+<ngx-spinner bdColor="rgba(0, 0, 0, 0.8)" size="medium" color="#fff" type="square-jelly-box" [fullScreen]="true">
+  <p style="color: white"> Loading... </p>
+</ngx-spinner>

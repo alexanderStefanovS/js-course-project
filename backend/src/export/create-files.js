@@ -48,7 +48,7 @@ function prepareFields(dbType, columns) {
   return columns.reduce((fields, column) => {
     const fieldName = prepareFieldName(column.columnName);
     const fieldType = getType(dbType, column.dataType);
-    const field = `\tprivate _${fieldName}: ${fieldType}\n`;
+    const field = `\tprivate _${fieldName}: ${fieldType};\n`;
     return fields.concat(field);
   }, '');
 }
@@ -57,7 +57,7 @@ function prepareConstructor(className, columns) {
   let constructor = `\n\tconstructor(init?: Partial<${className}>) {\n\t\tif (init) {\n`;
   constructor = columns.reduce((constr, column) => {
     const fieldName = prepareFieldName(column.columnName);
-    constr = constr.concat(`\t\t\tthis.${fieldName} = init.${fieldName}\n`);
+    constr = constr.concat(`\t\t\tthis.${fieldName} = init.${fieldName};\n`);
     return constr;
   }, constructor);
   constructor = constructor.concat('\t\t}\n\t}\n');

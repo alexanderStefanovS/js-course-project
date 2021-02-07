@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { NgxSpinnerService } from 'ngx-spinner';
 import { MySQLConnectionData } from 'src/app/classes/mysql-connection-data';
 import { TestConnection } from 'src/app/classes/test-connection';
 import { DatabaseTypes } from 'src/app/enums/database-types.enum';
@@ -23,7 +24,8 @@ export class DbConnctionComponent implements OnInit {
   public isTestSuccessful = false;
 
   constructor(
-    private baseService: BaseService
+    private baseService: BaseService,
+    private spinner: NgxSpinnerService
   ) { }
 
   ngOnInit(): void {
@@ -44,11 +46,13 @@ export class DbConnctionComponent implements OnInit {
   }
 
   onTestConnection() {
+    this.spinner.show();
     this.isTestSuccessful = false;
     const testConnection = new TestConnection(this.dbFormModel, this.selecteDbType as DatabaseTypes);
     this.baseService.submitData(this.DB_TEST_URL, testConnection)
       .subscribe((test: any) => {
         this.isTestSuccessful = test === true;
+        this.spinner.hide();
       });
   }
 

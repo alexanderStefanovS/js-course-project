@@ -1,5 +1,5 @@
 import { Injectable, Injector } from '@angular/core';
-import {HttpClient} from '@angular/common/http';
+import {HttpClient, HttpHeaders} from '@angular/common/http';
 import { createDeepCopy } from '../functions/create-deep-copy';
 import { map } from 'rxjs/operators';
 
@@ -28,6 +28,17 @@ export class BaseService {
   submitData(urlSuffix: string, obj: any) {
     const url = `${this.baseUrl}/${urlSuffix}`;
     return this.http.post(url, obj);
+  }
+
+  loadFile(urlSuffix: string, obj: any) {
+    const url = `${this.baseUrl}/${urlSuffix}`;
+
+    return this.http.post(url, obj, {responseType: 'blob' as 'json', observe: 'response'})
+      .pipe(
+        map((res: any) => {
+          return {archive: res.body, filename: res.headers.get('Filename')}
+        })
+      )
   }
 
 }

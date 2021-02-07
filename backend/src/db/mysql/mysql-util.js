@@ -30,7 +30,6 @@ function end(connection, results) {
 }
 
 function query(connection, sql, values) {
-  console.log(sql);
   return new Promise((resolve, reject) => {
     connection.query(sql, values, function(err, results, fields) {
       if (err) {

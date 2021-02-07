@@ -1,6 +1,8 @@
 import { Component, OnInit } from '@angular/core';
+import { NgxSpinnerService } from 'ngx-spinner';
 import { Table } from 'src/app/classes/table';
 import { TableColumn } from 'src/app/classes/table-column';
+import { download } from 'src/app/functions/download';
 import { BaseService } from 'src/app/services/base.service';
 
 @Component({
@@ -12,12 +14,14 @@ export class DbMetadataComponent implements OnInit {
 
   public readonly GET_TABLES_URL = 'db-metadata/db';
   public readonly GET_TABLE_COLUMNS_URL = 'db-metadata/table';
+  public readonly EXPORT_URL = 'export-models/from-db';
 
   public tables: Table[] = [];
   public selectedTable!: Table;
 
   constructor(
-    private baseService: BaseService
+    private baseService: BaseService,
+    private spinner: NgxSpinnerService
   ) { }
 
   ngOnInit(): void {
@@ -65,6 +69,24 @@ export class DbMetadataComponent implements OnInit {
     return this.tables.reduce((isDisabled, table) => {
       return !table.isChecked && isDisabled;
     }, true);
+  }
+
+  onGenerateFiles() {
+    this.spinner.show();
+
+    const selectedTables: Table[] = this.tables.reduce((acc: Table[], table) => {
+      if (table.isChecked) {
+        table.columns = table.columns.filter(column => column.isChecked);
+        acc.push(table);
+      }
+      return acc;
+    }, []);
+
+    this.baseService.loadFile(this.EXPORT_URL, selectedTables)
+      .subscribe(({archive, filename}) => {
+        download(archive, filename);
+        this.spinner.hide();
+      });
   }
 
 }
