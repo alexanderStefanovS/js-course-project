@@ -13,6 +13,8 @@ import { HttpClientModule } from '@angular/common/http';
 import { MysqlConnectionFormComponent } from './components/db-connection-forms/mysql-connection-form/mysql-connection-form.component';
 import { DbMetadataComponent } from './components/db-metadata/db-metadata.component';
 import { NgxSpinnerModule } from 'ngx-spinner';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
 
 @NgModule({
   declarations: [
@@ -22,7 +24,7 @@ import { NgxSpinnerModule } from 'ngx-spinner';
     DbConnctionComponent,
     CustomGenerationComponent,
     MysqlConnectionFormComponent,
-    DbMetadataComponent
+    DbMetadataComponent,
   ],
   imports: [
     BrowserModule,
@@ -30,7 +32,9 @@ import { NgxSpinnerModule } from 'ngx-spinner';
     NgSelectModule,
     FormsModule,
     NgxSpinnerModule,
-    HttpClientModule
+    BrowserAnimationsModule,
+    HttpClientModule,
+    SweetAlert2Module.forRoot()
   ],
   providers: [],
   bootstrap: [AppComponent]

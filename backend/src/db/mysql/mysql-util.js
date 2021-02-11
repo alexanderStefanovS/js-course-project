@@ -49,7 +49,7 @@ export function testMySQLConnection(data) {
     .then(() => end(connection, null))
     .then(() => true)
     .catch((err) => {
-      return new ErrorResponse(err.code, `${DB_CONNECT_ERR_MSG} ${connectionData.database}`);
+      throw new ErrorResponse(err.code, `${DB_CONNECT_ERR_MSG} ${connectionData.database}`);
     });
 }
 

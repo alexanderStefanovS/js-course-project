@@ -1,5 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
+import { Router } from '@angular/router';
+import { SwalComponent, SwalPortalTargets } from '@sweetalert2/ngx-sweetalert2';
 import { NgxSpinnerService } from 'ngx-spinner';
+import { ErrorResponse } from 'src/app/classes/error-response';
 import { Table } from 'src/app/classes/table';
 import { TableColumn } from 'src/app/classes/table-column';
 import { download } from 'src/app/functions/download';
@@ -18,10 +21,18 @@ export class DbMetadataComponent implements OnInit {
 
   public tables: Table[] = [];
   public selectedTable!: Table;
+  public errMsg: string = '';
+  public isTablesDataLoading = false;
+  public isColumnsDataLoading = false;
+
+  @ViewChild('successSwal') private successSwal!: SwalComponent;
+  @ViewChild('errorSwal') private errorSwal!: SwalComponent;
 
   constructor(
     private baseService: BaseService,
-    private spinner: NgxSpinnerService
+    private spinner: NgxSpinnerService,
+    private router: Router,
+    public readonly swalTargets: SwalPortalTargets
   ) { }
 
   ngOnInit(): void {
@@ -29,20 +40,38 @@ export class DbMetadataComponent implements OnInit {
   }
 
   private loadTables() {
+    this.isTablesDataLoading = true;
     this.baseService.loadData(this.GET_TABLES_URL, Table)
-      .subscribe((tables: Table[]) => {
-        this.tables = tables;
-        this.selectedTable = this.tables[0];
-        this.loadTableColumns();
-      });
+      .subscribe(
+        (tables: Table[]) => {
+          this.tables = tables;
+          this.selectedTable = this.tables[0];
+          this.loadTableColumns();
+          this.isTablesDataLoading = false;
+        },
+        (err: ErrorResponse) => {
+          this.errMsg = err.message;
+          this.isTablesDataLoading = false;
+          this.errorSwal.fire();
+        }
+      );
   }
 
   private loadTableColumns() {
+    this.isColumnsDataLoading = true;
     const url = `${this.GET_TABLE_COLUMNS_URL}/${this.selectedTable.tableName}`;
     this.baseService.loadData(url, TableColumn)
-      .subscribe((columns: TableColumn[]) => {
-        this.selectedTable.columns = columns;
-      });
+      .subscribe(
+        (columns: TableColumn[]) => {
+          this.selectedTable.columns = columns;
+          this.isColumnsDataLoading = false;
+        },
+        (err: ErrorResponse) => {
+          this.errMsg = err.message;
+          this.isColumnsDataLoading = false;
+          this.errorSwal.fire();
+        }
+      );
   }
 
   onClickTable(table: Table) {
@@ -83,10 +112,23 @@ export class DbMetadataComponent implements OnInit {
     }, []);
 
     this.baseService.loadFile(this.EXPORT_URL, selectedTables)
-      .subscribe(({archive, filename}) => {
-        download(archive, filename);
-        this.spinner.hide();
-      });
+      .subscribe(
+        ({archive, filename}) => {
+          download(archive, filename);
+          this.spinner.hide();
+          this.successSwal.fire();
+        },
+        (err: ErrorResponse) => {
+          console.log(err);
+          this.errMsg = 'Error generating models';
+          this.spinner.hide();
+          this.errorSwal.fire();
+        }
+      );
+  }
+
+  redirectOnError() {
+    this.router.navigate(['../db-connection']);
   }
 
 }

@@ -1,5 +1,7 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
+import { SwalComponent, SwalPortalTargets } from '@sweetalert2/ngx-sweetalert2';
 import { NgxSpinnerService } from 'ngx-spinner';
+import { ErrorResponse } from 'src/app/classes/error-response';
 import { MySQLConnectionData } from 'src/app/classes/mysql-connection-data';
 import { TestConnection } from 'src/app/classes/test-connection';
 import { DatabaseTypes } from 'src/app/enums/database-types.enum';
@@ -22,10 +24,15 @@ export class DbConnctionComponent implements OnInit {
   public dbFormModel: any;
   public isDbFormValid = false;
   public isTestSuccessful = false;
+  public connErrMsg: string = '';
+
+  @ViewChild('successSwal') private successSwal!: SwalComponent;
+  @ViewChild('errorSwal') private errorSwal!: SwalComponent;
 
   constructor(
     private baseService: BaseService,
-    private spinner: NgxSpinnerService
+    private spinner: NgxSpinnerService,
+    public readonly swalTargets: SwalPortalTargets
   ) { }
 
   ngOnInit(): void {
@@ -49,11 +56,19 @@ export class DbConnctionComponent implements OnInit {
     this.spinner.show();
     this.isTestSuccessful = false;
     const testConnection = new TestConnection(this.dbFormModel, this.selecteDbType as DatabaseTypes);
+
     this.baseService.submitData(this.DB_TEST_URL, testConnection)
-      .subscribe((test: any) => {
-        this.isTestSuccessful = test === true;
-        this.spinner.hide();
-      });
+      .subscribe(
+        (test: any) => {
+          this.isTestSuccessful = test === true;
+          this.spinner.hide();
+          this.successSwal.fire();
+        }, (err: ErrorResponse) => {
+          this.connErrMsg = err.message;
+          this.spinner.hide();
+          this.errorSwal.fire();
+        }
+      );
   }
 
   onFormValidChange(isFormValid: boolean) {

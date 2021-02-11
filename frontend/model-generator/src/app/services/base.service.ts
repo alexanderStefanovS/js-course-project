@@ -1,7 +1,9 @@
 import { Injectable, Injector } from '@angular/core';
 import {HttpClient, HttpHeaders} from '@angular/common/http';
 import { createDeepCopy } from '../functions/create-deep-copy';
-import { map } from 'rxjs/operators';
+import { catchError, map } from 'rxjs/operators';
+import { throwError } from 'rxjs';
+import { ErrorResponse } from '../classes/error-response';
 
 @Injectable({
   providedIn: 'root'
@@ -19,6 +21,7 @@ export class BaseService {
     const url = `${this.baseUrl}/${urlSuffix}`;
     return this.http.get(url)
       .pipe(
+        catchError(err => throwError(new ErrorResponse(err.error))),
         map((data: any) => {
           return type ? createDeepCopy(data, type) : data;
         })
@@ -27,7 +30,10 @@ export class BaseService {
 
   submitData(urlSuffix: string, obj: any) {
     const url = `${this.baseUrl}/${urlSuffix}`;
-    return this.http.post(url, obj);
+    return this.http.post(url, obj)
+      .pipe(
+        catchError(err => throwError(new ErrorResponse(err.error)))
+      )
   }
 
   loadFile(urlSuffix: string, obj: any) {
@@ -35,6 +41,7 @@ export class BaseService {
 
     return this.http.post(url, obj, {responseType: 'blob' as 'json', observe: 'response'})
       .pipe(
+        catchError(err => { console.log(err); return throwError(new ErrorResponse(err.error))}),
         map((res: any) => {
           return {archive: res.body, filename: res.headers.get('Filename')}
         })

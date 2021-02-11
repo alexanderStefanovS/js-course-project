@@ -18,6 +18,7 @@ export class MysqlConnectionFormComponent implements OnInit, AfterViewInit {
   constructor() { }
 
   ngOnInit(): void {
+    this.validEmitter.emit(this.isFormValid);
     this.mySqlForm?.valueChanges?.subscribe(
       () => {
         if (this.mySqlForm?.valid !== this.isFormValid) {

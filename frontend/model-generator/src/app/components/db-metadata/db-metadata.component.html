@@ -7,6 +7,10 @@
           <h5 class="m-0">TABLES</h5>
         </div>
         <div class="card-body overflow-auto p-1">
+          <div *ngIf="isTablesDataLoading">
+            <h5 class="d-inline mr-2">Loading data...</h5>
+            <div class="spinner-border" role="status"></div>
+          </div>
           <div class="list-group">
             <button *ngFor="let table of tables" type="button"
               class="list-group-item list-group-item-action d-flex justify-content-between"
@@ -27,6 +31,10 @@
           <h5 class="m-0">TABLE COLUMNS</h5>
         </div>
         <div class="card-body overflow-auto p-1">
+          <div *ngIf="isColumnsDataLoading">
+            <h5 class="d-inline mr-2">Loading data...</h5>
+            <div class="spinner-border" role="status"></div>
+          </div>
           <ul class="list-group">
             <li *ngFor="let column of selectedTable?.columns" class="list-group-item d-flex justify-content-between">
               <h6 class="m-0">{{ column.columnName }}</h6>
@@ -69,6 +77,16 @@
     </div>
   </div>
 </div>
-<ngx-spinner bdColor="rgba(0, 0, 0, 0.8)" size="medium" color="#fff" type="square-jelly-box" [fullScreen]="true">
+
+<ngx-spinner bdColor="rgba(0, 0, 0, 0.8)" size="medium" color="#fff" type="pacman" [fullScreen]="true">
   <p style="color: white"> Loading... </p>
 </ngx-spinner>
+
+<swal #successSwal title="The generation is successful" icon="success">
+</swal>
+
+<swal #errorSwal icon="error" [allowOutsideClick]="false" (confirm)="redirectOnError()">
+  <div *swalPortal="swalTargets.title">
+    <h4>{{ errMsg }}</h4>
+  </div>
+</swal>
