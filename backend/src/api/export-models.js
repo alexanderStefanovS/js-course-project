@@ -9,6 +9,7 @@ import {EXPORT_SCHEMA} from '../joi-schemas/export-schema.js';
 import {INVALID_REQUEST_DATA, NO_CONNECTION_SET_SYS_MSG, NO_CONNECTION_SET_USR_MSG} from '../constants/error-messages.js';
 import {ErrorResponse} from '../classes/error-response.js';
 import {BAD_REQUEST, FORBIDDEN, INTERNAL_SERVER_ERROR} from '../constants/http-status-codes.js';
+import {DATA_TYPES} from '../constants/data-types.js';
 
 export const exportModels = Router();
 
@@ -30,6 +31,10 @@ function removeGenratedDirsAndFiles() {
     });
   });
 }
+
+exportModels.get('/data-types', (req, res) => {
+  res.send(DATA_TYPES);
+});
 
 exportModels.post('/from-db', (req, res, next) => {
   const connectionData = req.session.connectionData;

@@ -119,7 +119,6 @@ export class DbMetadataComponent implements OnInit {
           this.successSwal.fire();
         },
         (err: ErrorResponse) => {
-          console.log(err);
           this.errMsg = 'Error generating models';
           this.spinner.hide();
           this.errorSwal.fire();

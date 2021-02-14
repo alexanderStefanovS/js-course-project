@@ -1,1 +1,113 @@
-<p>custom-generation works!</p>
+<app-header [hasHomeBtn]="true"></app-header>
+<div class="container-fluid p-3">
+  <div class="row">
+    <div class="col-md-4">
+      <div class="card" style="height: calc(100vh - 5.5rem);">
+        <div class="card-header">
+          <h5 class="m-0">CLASS NAMES</h5>
+        </div>
+        <div class="card-body overflow-auto p-2">
+          <form #classNameForm="ngForm" class="was-validated">
+            <div class="form-group d-flex">
+              <input [(ngModel)]="className" name="className" id="class-name" class="form-control mr-2" type="text"
+                placeholder="Class name" autocomplete="off" required>
+              <button [disabled]="!className" type="button" class="btn btn-outline-secondary btn-round"
+                (click)="addClassName()">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 16" width="12" height="16">
+                  <path fill-rule="evenodd" d="M12 9H7v5H5V9H0V7h5V2h2v5h5v2z"></path>
+                </svg>
+              </button>
+            </div>
+          </form>
+          <div class="list-group">
+            <button *ngFor="let class of classes" type="button" (click)="selectedClass = class"
+              class="list-group-item list-group-item-action d-flex justify-content-between"
+              [ngClass]="{'active': class.tableName === selectedClass?.tableName}">
+              <h6 class="m-0">{{ class.tableName }}</h6>
+              <div>
+                <button class="btn btn-sm btn-outline-danger" (click)="removeClassName(class.tableName)">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 16" width="12" height="16">
+                    <path fill-rule="evenodd"
+                      d="M11 2H9c0-.55-.45-1-1-1H5c-.55 0-1 .45-1 1H2c-.55 0-1 .45-1 1v1c0 .55.45 1 1 1v9c0 .55.45 1 1 1h7c.55 0 1-.45 1-1V5c.55 0 1-.45 1-1V3c0-.55-.45-1-1-1zm-1 12H3V5h1v8h1V5h1v8h1V5h1v8h1V5h1v9zm1-10H2V3h9v1z">
+                    </path>
+                  </svg>
+                </button>
+              </div>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card" style="height: calc(100vh - 5.5rem);">
+        <div class="card-header">
+          <h5 class="m-0">CLASS FIELDS</h5>
+        </div>
+        <div class="card-body overflow-auto pt-2">
+          <form *ngIf="selectedClass?.tableName" #fieldNameForm="ngForm" class="was-validated">
+            <div class="form-group row">
+              <div class="col-md-5">
+                <input [(ngModel)]="fieldName" name="fieldName" id="field-name" class="form-control" type="text"
+                  placeholder="Field name" autocomplete="off" required>
+              </div>
+              <div class="col-md-5">
+                <ng-select [items]="dataTypes" id="db-type" name="db-type" [(ngModel)]="selectedDataType"
+                  placeholder="Data type">
+                </ng-select>
+              </div>
+              <div class="col-md-2">
+                <button [disabled]="!(selectedDataType && fieldName)" type="button" class="btn btn-outline-secondary btn-round"
+                  (click)="addFieldName()">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 16" width="12" height="16">
+                    <path fill-rule="evenodd" d="M12 9H7v5H5V9H0V7h5V2h2v5h5v2z"></path>
+                  </svg>
+                </button>
+              </div>
+            </div>
+          </form>
+          <ul class="list-group">
+            <li *ngFor="let field of selectedClass?.columns" class="list-group-item d-flex justify-content-between">
+              <h6 class="m-0">{{ field.columnName }}</h6>
+              <div>
+                <button class="btn btn-sm btn-outline-danger" (click)="removeField(field.columnName)">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 16" width="12" height="16">
+                    <path fill-rule="evenodd"
+                      d="M11 2H9c0-.55-.45-1-1-1H5c-.55 0-1 .45-1 1H2c-.55 0-1 .45-1 1v1c0 .55.45 1 1 1v9c0 .55.45 1 1 1h7c.55 0 1-.45 1-1V5c.55 0 1-.45 1-1V3c0-.55-.45-1-1-1zm-1 12H3V5h1v8h1V5h1v8h1V5h1v8h1V5h1v9zm1-10H2V3h9v1z">
+                    </path>
+                  </svg>
+                </button>
+              </div>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card" style="height: calc(100vh - 5.5rem);">
+        <div class="card-header">
+          <h5 class="m-0">CLASSES AND FIELDS</h5>
+        </div>
+        <div class="card-body overflow-auto p-1">
+          <ul class="list-group">
+            <div *ngFor="let class of classes">
+              <li class="list-group-item">
+                <h6 class="mb-2"><b>Class:</b> {{ class.tableName }}</h6>
+                <p>
+                  <b>Fields:</b>
+                  <span *ngFor="let field of class.columns; let i = index">
+                    {{ field.columnName }}<span *ngIf="isSemicolumnNeeded(class.columns, i)">,</span>
+                  </span>
+                </p>
+              </li>
+            </div>
+          </ul>
+        </div>
+        <div class="card-footer d-flex flex-row-reverse">
+          <button type="button" class="btn btn-primary" [disabled]="isGenrateButtonDisabled()"
+            (click)="onGenerateFiles()">
+            Generate models
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
