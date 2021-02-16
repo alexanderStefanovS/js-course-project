@@ -67,7 +67,7 @@
           </form>
           <ul class="list-group">
             <li *ngFor="let field of selectedClass?.columns" class="list-group-item d-flex justify-content-between">
-              <h6 class="m-0">{{ field.columnName }}</h6>
+              <h6 class="m-0">{{ field.columnName }}: {{ field.dataType }}</h6>
               <div>
                 <button class="btn btn-sm btn-outline-danger" (click)="removeField(field.columnName)">
                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 16" width="12" height="16">
@@ -111,3 +111,12 @@
       </div>
     </div>
   </div>
+
+  <swal #successSwal title="The generation is successful" icon="success">
+  </swal>
+
+  <swal #errorSwal icon="error" [allowOutsideClick]="false" (confirm)="redirectOnError()">
+    <div *swalPortal="swalTargets.title">
+      <h4>{{ errMsg }}</h4>
+    </div>
+  </swal>

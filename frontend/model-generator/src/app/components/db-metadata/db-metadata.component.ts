@@ -17,7 +17,7 @@ export class DbMetadataComponent implements OnInit {
 
   public readonly GET_TABLES_URL = 'db-metadata/db';
   public readonly GET_TABLE_COLUMNS_URL = 'db-metadata/table';
-  public readonly EXPORT_URL = 'export-models/from-db';
+  public readonly EXPORT_URL = 'export-models';
 
   public tables: Table[] = [];
   public selectedTable!: Table;
@@ -105,8 +105,9 @@ export class DbMetadataComponent implements OnInit {
 
     const selectedTables: Table[] = this.tables.reduce((acc: Table[], table) => {
       if (table.isChecked) {
-        table.columns = table.columns.filter(column => column.isChecked);
-        acc.push(table);
+        const columns = table.columns.filter(column => column.isChecked);
+        const genTable = new Table({tableName: table.tableName, columns});
+        acc.push(genTable);
       }
       return acc;
     }, []);
@@ -128,6 +129,10 @@ export class DbMetadataComponent implements OnInit {
 
   redirectOnError() {
     this.router.navigate(['../db-connection']);
+  }
+
+  onCheckAllColumns() {
+    this.selectedTable.columns.forEach(column => column.isChecked = !column.isChecked);
   }
 
 }

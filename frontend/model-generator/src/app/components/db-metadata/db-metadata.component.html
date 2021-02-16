@@ -27,8 +27,10 @@
     </div>
     <div class="col-md-4">
       <div class="card" style="height: calc(100vh - 5.5rem);">
-        <div class="card-header">
+        <div class="card-header d-flex justify-content-between">
           <h5 class="m-0">TABLE COLUMNS</h5>
+          <input *ngIf="selectedTable.isChecked" [checked]="true" class="mr-2 mt-2" type="checkbox"
+            (click)="onCheckAllColumns()">
         </div>
         <div class="card-body overflow-auto p-1">
           <div *ngIf="isColumnsDataLoading">

@@ -47,7 +47,7 @@ function getType(dbType, columnType) {
 function prepareFields(dbType, columns) {
   return columns.reduce((fields, column) => {
     const fieldName = prepareFieldName(column.columnName);
-    const fieldType = getType(dbType, column.dataType);
+    const fieldType = dbType ? getType(dbType, column.dataType) : column.dataType;
     const field = `\tprivate _${fieldName}: ${fieldType};\n`;
     return fields.concat(field);
   }, '');
@@ -76,7 +76,7 @@ function generateSetter(field, type) {
 function prepareGettersAndSetters(dbType, columns) {
   return columns.reduce((acc, column) => {
     const fieldName = prepareFieldName(column.columnName);
-    const fieldType = getType(dbType, column.dataType);
+    const fieldType = dbType ? getType(dbType, column.dataType) : column.dataType;
     return acc.concat(`${generateGetter(fieldName, fieldType)}${generateSetter(fieldName, fieldType)}\n`);
   }, '');
 }
@@ -139,7 +139,8 @@ function createFiles(dbType, tables, dirname) {
 
 export function generateFiles(dbType, tables, database) {
   const dateAndTime = getDateAndTime();
-  const dirname = resolve(`${GENERATED_FILES_DIR}/${database}-${dateAndTime}`);
+  const name = database ? `${database}-${dateAndTime}` : `${dateAndTime}`;
+  const dirname = resolve(`${GENERATED_FILES_DIR}/${name}`);
   
   return mkDir(dirname)
     .then(() => createFiles(dbType, tables, dirname))
