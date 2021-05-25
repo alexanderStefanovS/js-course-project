@@ -1,4 +1,5 @@
 
 export enum DatabaseTypes {
-  MYSQL = 'MySQL'
+  MYSQL = 'MySQL',
+  POSTGRE = 'PostgreSQL'
 }

@@ -24,7 +24,7 @@ export class DbConnctionComponent implements OnInit {
   public dbFormModel: any;
   public isDbFormValid = false;
   public isTestSuccessful = false;
-  public connErrMsg: string = '';
+  public connErrMsg = '';
 
   @ViewChild('successSwal') private successSwal!: SwalComponent;
   @ViewChild('errorSwal') private errorSwal!: SwalComponent;
@@ -39,20 +39,21 @@ export class DbConnctionComponent implements OnInit {
     this.loadDatabaseTypes();
   }
 
-  private loadDatabaseTypes() {
+  private loadDatabaseTypes(): void {
     this.baseService.loadData(this.DB_TYPES_URL)
       .subscribe((dbTypes: string[]) => {
         this.databaseTypes = dbTypes;
       });
   }
 
-  onDbTypeChange() {
+  onDbTypeChange(): void {
     switch (this.selecteDbType) {
-      case DatabaseTypes.MYSQL: this.dbFormModel = new MySQLConnectionData({});
+      case DatabaseTypes.MYSQL: this.dbFormModel = new MySQLConnectionData({}); break;
+      case DatabaseTypes.POSTGRE: this.dbFormModel = new MySQLConnectionData({}); break;
     }
   }
 
-  onTestConnection() {
+  onTestConnection(): void {
     this.spinner.show();
     this.isTestSuccessful = false;
     const testConnection = new TestConnection(this.dbFormModel, this.selecteDbType as DatabaseTypes);
@@ -71,7 +72,7 @@ export class DbConnctionComponent implements OnInit {
       );
   }
 
-  onFormValidChange(isFormValid: boolean) {
+  onFormValidChange(isFormValid: boolean): void {
     this.isDbFormValid = isFormValid;
   }
 

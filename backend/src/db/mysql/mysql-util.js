@@ -2,7 +2,7 @@
 import {MySQLConnectionData} from './mysql-connection-data.js';
 import mysql from 'mysql';
 import {ErrorResponse} from '../../classes/error-response.js';
-import {DB_CONNECT_ERR_MSG} from './mysql-queries.js';
+import {DB_CONNECT_ERR_MSG} from '../../constants/error-messages.js';
 import {FN_MAP} from './map-consts.js';
 
 function connect(connection) {
@@ -64,5 +64,7 @@ function extractMysqlData({sql, processFn, errMsg}, params, data) {
     .then(() => query(connection, sql, params))
     .then((results) => end(connection, results))
     .then((results) => processFn(results))
-    .catch((err) => new ErrorResponse(err.sqlMessage, `${errMsg}${connectionData.database}`));
+    .catch((err) => { 
+      throw new ErrorResponse(err.sqlMessage, `${errMsg}${connectionData.database}`); 
+    });
 }

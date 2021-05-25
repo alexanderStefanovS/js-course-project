@@ -3,14 +3,17 @@
   <div class="row mt-5">
     <div class="col-md-3"></div>
     <div class="col-md-6">
-      <form #form="ngForm">
+      <form #form="ngForm" [ngSwitch]="selecteDbType">
         <div class="form-group">
           <label for="db-type">Database type</label>
           <ng-select id="db-type" name="db-type" [(ngModel)]="selecteDbType" [items]="databaseTypes"
             (change)="onDbTypeChange()" placeholder="Database type">
           </ng-select>
         </div>
-        <app-mysql-connection-form *ngIf="selecteDbType === DATABASE_TYPES.MYSQL" [mySqlConnectionData]="dbFormModel"
+        <app-mysql-connection-form *ngSwitchCase="DATABASE_TYPES.MYSQL" [mySqlConnectionData]="dbFormModel"
+          (validEmitter)="onFormValidChange($event)">
+        </app-mysql-connection-form>
+        <app-mysql-connection-form *ngSwitchCase="DATABASE_TYPES.POSTGRE" [mySqlConnectionData]="dbFormModel"
           (validEmitter)="onFormValidChange($event)">
         </app-mysql-connection-form>
         <div class="d-flex justify-content-between mt-3">

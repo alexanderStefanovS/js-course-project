@@ -41,14 +41,15 @@ function prepareFieldName(columnName) {
 }
 
 function getType(dbType, columnType) {
-  return DATA_TYPES_MAP[dbType][columnType];
+  return DATA_TYPES_MAP[dbType][columnType] || 'any';
 }
 
 function prepareFields(dbType, columns) {
   return columns.reduce((fields, column) => {
     const fieldName = prepareFieldName(column.columnName);
     const fieldType = dbType ? getType(dbType, column.dataType) : column.dataType;
-    const field = `\tprivate _${fieldName}: ${fieldType};\n`;
+    // const field = `\tprivate _${fieldName}: ${fieldType};\n`;
+    const field = `\tpublic ${fieldName}: ${fieldType};\n`;
     return fields.concat(field);
   }, '');
 }
@@ -90,10 +91,11 @@ function createFile(dbType, table, dirname) {
   const classHeader = prepareClassHeader(className);
   const fields = prepareFields(dbType, table.columns);
   const constructor = prepareConstructor(className, table.columns);
-  const gettersAndSetters = prepareGettersAndSetters(dbType, table.columns);
+  // const gettersAndSetters = prepareGettersAndSetters(dbType, table.columns);
   const classFooter = prepareClassFooter();
   
-  const content = ''.concat(classHeader, fields, constructor, gettersAndSetters, classFooter);
+  // const content = ''.concat(classHeader, fields, constructor, gettersAndSetters, classFooter);
+  const content = ''.concat(classHeader, fields, constructor, classFooter);
 
   const path = join(dirname, fileName);
   return writeInFile(path, content);
@@ -141,7 +143,7 @@ export function generateFiles(dbType, tables, database) {
   const dateAndTime = getDateAndTime();
   const name = database ? `${database}-${dateAndTime}` : `${dateAndTime}`;
   const dirname = resolve(`${GENERATED_FILES_DIR}/${name}`);
-  
+
   return mkDir(dirname)
     .then(() => createFiles(dbType, tables, dirname))
     .then(() => dirname)

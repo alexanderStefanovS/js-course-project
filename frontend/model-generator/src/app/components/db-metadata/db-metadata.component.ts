@@ -21,7 +21,7 @@ export class DbMetadataComponent implements OnInit {
 
   public tables: Table[] = [];
   public selectedTable!: Table;
-  public errMsg: string = '';
+  public errMsg = '';
   public isTablesDataLoading = false;
   public isColumnsDataLoading = false;
 
@@ -39,7 +39,9 @@ export class DbMetadataComponent implements OnInit {
     this.loadTables();
   }
 
-  private loadTables() {
+  //#region services
+
+  private loadTables(): void {
     this.isTablesDataLoading = true;
     this.baseService.loadData(this.GET_TABLES_URL, Table)
       .subscribe(
@@ -57,7 +59,7 @@ export class DbMetadataComponent implements OnInit {
       );
   }
 
-  private loadTableColumns() {
+  private loadTableColumns(): void {
     this.isColumnsDataLoading = true;
     const url = `${this.GET_TABLE_COLUMNS_URL}/${this.selectedTable.tableName}`;
     this.baseService.loadData(url, TableColumn)
@@ -74,18 +76,20 @@ export class DbMetadataComponent implements OnInit {
       );
   }
 
-  onClickTable(table: Table) {
+  //#endregion
+
+  onClickTable(table: Table): void {
     this.selectedTable = table;
     if (!this.selectedTable.columns.length) {
       this.loadTableColumns();
     }
   }
 
-  onCheckTable(table: Table) {
+  onCheckTable(table: Table): void {
     table.isChecked = !table.isChecked;
   }
 
-  isSemicolumnNeeded(columns: TableColumn[], index: number) {
+  isSemicolumnNeeded(columns: TableColumn[], index: number): boolean {
     for (let i = index + 1; i < columns.length; i++) {
       if (columns[i].isChecked) {
         return true;
@@ -94,13 +98,13 @@ export class DbMetadataComponent implements OnInit {
     return false;
   }
 
-  isGenrateButtonDisabled() {
+  isGenrateButtonDisabled(): any {
     return this.tables.reduce((isDisabled, table) => {
       return !table.isChecked && isDisabled;
     }, true);
   }
 
-  onGenerateFiles() {
+  onGenerateFiles(): void {
     this.spinner.show();
 
     const selectedTables: Table[] = this.tables.reduce((acc: Table[], table) => {
@@ -127,11 +131,11 @@ export class DbMetadataComponent implements OnInit {
       );
   }
 
-  redirectOnError() {
+  redirectOnError(): void {
     this.router.navigate(['../db-connection']);
   }
 
-  onCheckAllColumns() {
+  onCheckAllColumns(): void {
     this.selectedTable.columns.forEach(column => column.isChecked = !column.isChecked);
   }
 

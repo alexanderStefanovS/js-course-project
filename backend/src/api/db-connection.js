@@ -9,6 +9,11 @@ import {getDbConnectionSchema} from '../joi-schemas/get-connection-schema.js';
 
 function validate(requestData) {
   const validationSchema = getDbConnectionSchema(requestData.dbType);
+
+  if (!validationSchema) {
+    return false;
+  }
+
   const {error} = validationSchema.validate(requestData);
   
   return error;

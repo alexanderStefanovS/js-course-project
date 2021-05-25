@@ -9,9 +9,9 @@ import { MySQLConnectionData } from 'src/app/classes/mysql-connection-data';
 })
 export class MysqlConnectionFormComponent implements OnInit, AfterViewInit {
 
-  public isFormValid: boolean = false;
+  public isFormValid = false;
 
-  @Input() mySqlConnectionData: MySQLConnectionData = new MySQLConnectionData({});;
+  @Input() mySqlConnectionData: MySQLConnectionData = new MySQLConnectionData({});
   @Output() validEmitter = new EventEmitter();
   @ViewChild('mySqlForm', { static: true }) mySqlForm: NgForm | undefined;
 
@@ -25,8 +25,7 @@ export class MysqlConnectionFormComponent implements OnInit, AfterViewInit {
           this.isFormValid = !!this.mySqlForm?.valid;
           this.validEmitter.emit(this.isFormValid);
         }
-      }
-    )
+      });
   }
 
   ngAfterViewInit(): void {
